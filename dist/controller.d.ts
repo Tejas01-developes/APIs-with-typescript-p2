@@ -1,0 +1,14 @@
+import { Request, Response } from "express";
+type body = {
+    name: string;
+    email: string;
+    password: string;
+};
+export declare const insertuser: (req: Request<{}, {}, body>, resp: Response) => Promise<Response<any, Record<string, any>>>;
+type loginbody = {
+    email: string;
+    password: string;
+};
+export declare const login: (req: Request<{}, {}, loginbody>, resp: Response) => Promise<Response<any, Record<string, any>>>;
+export {};
+//# sourceMappingURL=controller.d.ts.map
