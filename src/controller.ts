@@ -1,8 +1,9 @@
 import { Request, Response } from "express"
-import { getlogindata, gettkninfo, inserttoken, insertusers, updatetkninfo } from "./service.js"
+import { addfile, getlogindata, gettkninfo, inserttoken, insertusers, updatetkninfo } from "./service.js"
 import bcrypt from 'bcrypt';
 import { taskqueue } from "./backgroundworker/workerqueue.js";
 import { access, refresh } from "./tokens.js";
+import path from "path";
 
 type body={
     name:string,
@@ -36,11 +37,6 @@ password:string
 }
 
 
-
-
-
-
-
 export const login=async(req:Request<{},{},loginbody>,resp:Response)=>{
 const{email,password}=req.body
 if(!email || !password){
@@ -54,20 +50,21 @@ const compare=await bcrypt.compare(password,getdetails?.password);
 if(!compare){
     return resp.status(400).json({success:false,message:"password is incorrect"})
 }
-const useridd=getdetails.id
+const userid=getdetails.id
 
-const accesstkn=access({userid:useridd})
+
+const accesstkn=access(userid)
 let refreshtkn:string;
 try{
-const gettkndta=await gettkninfo({id:useridd})
+const gettkndta=await gettkninfo({id:userid})
 if(!gettkndta){
-    refreshtkn=refresh({userid:useridd})
-const inserttkn=await inserttoken({userid:useridd,token:refreshtkn})
+    refreshtkn=refresh(userid)
+const inserttkn=await inserttoken({userid:userid,token:refreshtkn})
 }else{
 const now=Date.now();
 const expiredate=gettkndta.expired_at;
 if(now > expiredate){
-    refreshtkn=refresh({userid:useridd})
+    refreshtkn=refresh(userid)
     const updatetkn=await updatetkninfo({token:refreshtkn})
 }else{
     refreshtkn=gettkndta.token
@@ -85,4 +82,30 @@ return resp.status(200).json({success:true,message:"login succesfully done"})
 }catch(err){
     return resp.status(400).json({success:false,message:"login failed"})
 }
+}
+
+interface cookieid extends Request{
+    id?:string
+    
+}
+
+export const uploadfile=async(req:cookieid,resp:Response)=>{
+    if(!req.file){
+        return resp.status(400).json({success:false,message:"file not recived"})
+    }
+    const foldername=process.env.UPLOAD_FOLDER as string
+    const filename=req.file.filename;
+    const extension=path.extname(req.file.originalname);
+    const fileurl=path.join(foldername,filename);
+    const id=req.id
+    console.log(id);
+    if(!id){
+        return resp.status(400).json({success:false,message:"no userid recived from cookie filter"})
+    }
+    try{
+        const insertfile=await addfile({userid:id,filename,extension,fileurl});
+        return resp.status(200).json({success:true,message:"data set succesfu;lly"})
+    }catch(err){
+        return resp.status(400).json({success:false,message:"file not recived"})   
+     }
 }

@@ -1,7 +1,3 @@
-type tkndta = {
-    userid: string;
-};
-export declare const access: (id: tkndta) => string;
-export declare const refresh: (id: tkndta) => string;
-export {};
+export declare const access: (id: string) => string;
+export declare const refresh: (id: string) => string;
 //# sourceMappingURL=tokens.d.ts.map

@@ -10,5 +10,9 @@ type loginbody = {
     password: string;
 };
 export declare const login: (req: Request<{}, {}, loginbody>, resp: Response) => Promise<Response<any, Record<string, any>>>;
+interface cookieid extends Request {
+    id?: string;
+}
+export declare const uploadfile: (req: cookieid, resp: Response) => Promise<Response<any, Record<string, any>>>;
 export {};
 //# sourceMappingURL=controller.d.ts.map

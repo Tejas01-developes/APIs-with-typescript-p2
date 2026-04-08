@@ -1,4 +1,4 @@
-import { ResultSetHeader, RowDataPacket } from "mysql2"
+import { RowDataPacket } from "mysql2"
 import { db } from "./dbconnection/mysqlconnection.js"
 
 
@@ -116,4 +116,21 @@ try{
             console.log("db insert failed")
              throw new Error("db insert failed")
         }
+        }
+
+
+type filedta={
+    filename:string,
+    extension:string,
+    fileurl:string,
+    userid:string
+}
+
+        export const addfile=async(data:filedta):Promise<RowDataPacket | null>=>{
+const [res]=await db.query<RowDataPacket[]>(
+    'insert into imagefolder (userid,filename,extension,fileurl) values (?,?,?,?)',
+    [data.userid,data.filename,data.extension,data.fileurl]
+)
+return res.length > 0 ? res[0]! :null
+
         }

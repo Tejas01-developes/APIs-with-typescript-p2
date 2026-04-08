@@ -38,5 +38,12 @@ type inserttkndta = RowDataPacket & {
     expired_at: number;
 };
 export declare const inserttoken: (data: inserttkn) => Promise<inserttkndta | null>;
+type filedta = {
+    filename: string;
+    extension: string;
+    fileurl: string;
+    userid: string;
+};
+export declare const addfile: (data: filedta) => Promise<RowDataPacket | null>;
 export {};
 //# sourceMappingURL=service.d.ts.map

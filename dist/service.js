@@ -49,4 +49,8 @@ export const inserttoken = async (data) => {
         throw new Error("db insert failed");
     }
 };
+export const addfile = async (data) => {
+    const [res] = await db.query('insert into imagefolder (userid,filename,extension,fileurl) values (?,?,?,?)', [data.userid, data.filename, data.extension, data.fileurl]);
+    return res.length > 0 ? res[0] : null;
+};
 //# sourceMappingURL=service.js.map

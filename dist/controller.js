@@ -1,7 +1,8 @@
-import { getlogindata, gettkninfo, inserttoken, insertusers, updatetkninfo } from "./service.js";
+import { addfile, getlogindata, gettkninfo, inserttoken, insertusers, updatetkninfo } from "./service.js";
 import bcrypt from 'bcrypt';
 import { taskqueue } from "./backgroundworker/workerqueue.js";
 import { access, refresh } from "./tokens.js";
+import path from "path";
 export const insertuser = async (req, resp) => {
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
@@ -35,20 +36,20 @@ export const login = async (req, resp) => {
     if (!compare) {
         return resp.status(400).json({ success: false, message: "password is incorrect" });
     }
-    const useridd = getdetails.id;
-    const accesstkn = access({ userid: useridd });
+    const userid = getdetails.id;
+    const accesstkn = access(userid);
     let refreshtkn;
     try {
-        const gettkndta = await gettkninfo({ id: useridd });
+        const gettkndta = await gettkninfo({ id: userid });
         if (!gettkndta) {
-            refreshtkn = refresh({ userid: useridd });
-            const inserttkn = await inserttoken({ userid: useridd, token: refreshtkn });
+            refreshtkn = refresh(userid);
+            const inserttkn = await inserttoken({ userid: userid, token: refreshtkn });
         }
         else {
             const now = Date.now();
             const expiredate = gettkndta.expired_at;
             if (now > expiredate) {
-                refreshtkn = refresh({ userid: useridd });
+                refreshtkn = refresh(userid);
                 const updatetkn = await updatetkninfo({ token: refreshtkn });
             }
             else {
@@ -66,6 +67,27 @@ export const login = async (req, resp) => {
     }
     catch (err) {
         return resp.status(400).json({ success: false, message: "login failed" });
+    }
+};
+export const uploadfile = async (req, resp) => {
+    if (!req.file) {
+        return resp.status(400).json({ success: false, message: "file not recived" });
+    }
+    const foldername = process.env.UPLOAD_FOLDER;
+    const filename = req.file.filename;
+    const extension = path.extname(req.file.originalname);
+    const fileurl = path.join(foldername, filename);
+    const id = req.id;
+    console.log(id);
+    if (!id) {
+        return resp.status(400).json({ success: false, message: "no userid recived from cookie filter" });
+    }
+    try {
+        const insertfile = await addfile({ userid: id, filename, extension, fileurl });
+        return resp.status(200).json({ success: true, message: "data set succesfu;lly" });
+    }
+    catch (err) {
+        return resp.status(400).json({ success: false, message: "file not recived" });
     }
 };
 //# sourceMappingURL=controller.js.map
