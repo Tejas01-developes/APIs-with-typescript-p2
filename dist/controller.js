@@ -1,8 +1,10 @@
-import { addfile, getlogindata, gettkninfo, inserttoken, insertusers, updatetkninfo } from "./service.js";
+import { addfile, getfiledta, getlogindata, gettkninfo, inserttoken, insertusers, updatetkninfo } from "./service.js";
 import bcrypt from 'bcrypt';
 import { taskqueue } from "./backgroundworker/workerqueue.js";
 import { access, refresh } from "./tokens.js";
 import path from "path";
+import fs from 'fs';
+import mime from 'mime';
 export const insertuser = async (req, resp) => {
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
@@ -88,6 +90,32 @@ export const uploadfile = async (req, resp) => {
     }
     catch (err) {
         return resp.status(400).json({ success: false, message: "file not recived" });
+    }
+};
+export const displayfile = async (req, resp) => {
+    const { userid } = req.body;
+    if (!userid) {
+        return resp.status(400).json({ success: false, message: "no body recived" });
+    }
+    try {
+        const getres = await getfiledta({ userid });
+        if (!getres) {
+            return resp.status(400).json({ success: false, message: "no result in the array" });
+        }
+        const url = getres.fileurl;
+        const fileurl = url.replace(/\\/g, "/");
+        if (!fs.existsSync(fileurl)) {
+            return resp.status(400).json({ success: false, message: "file path is not correct" });
+        }
+        const mimetype = mime.getType(fileurl);
+        if (!mimetype) {
+            return resp.status(400).json({ success: false, message: "mimetype is not avalible" });
+        }
+        resp.setHeader("Content-Type", mimetype);
+        fs.createReadStream(fileurl).pipe(resp);
+    }
+    catch (err) {
+        return resp.status(400).json({ success: false, message: "getting file data failed" });
     }
 };
 //# sourceMappingURL=controller.js.map

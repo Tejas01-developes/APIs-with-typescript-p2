@@ -45,5 +45,9 @@ type filedta = {
     userid: string;
 };
 export declare const addfile: (data: filedta) => Promise<RowDataPacket | null>;
+type filedata = {
+    userid: string;
+};
+export declare const getfiledta: (data: filedata) => Promise<RowDataPacket | null>;
 export {};
 //# sourceMappingURL=service.d.ts.map

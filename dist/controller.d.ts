@@ -14,5 +14,6 @@ interface cookieid extends Request {
     id?: string;
 }
 export declare const uploadfile: (req: cookieid, resp: Response) => Promise<Response<any, Record<string, any>>>;
+export declare const displayfile: (req: Request, resp: Response) => Promise<Response<any, Record<string, any>> | undefined>;
 export {};
 //# sourceMappingURL=controller.d.ts.map

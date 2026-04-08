@@ -53,4 +53,13 @@ export const addfile = async (data) => {
     const [res] = await db.query('insert into imagefolder (userid,filename,extension,fileurl) values (?,?,?,?)', [data.userid, data.filename, data.extension, data.fileurl]);
     return res.length > 0 ? res[0] : null;
 };
+export const getfiledta = async (data) => {
+    try {
+        const [res] = await db.query('select * from imagefolder where userid=?', [data.userid]);
+        return res.length > 0 ? res[0] : null;
+    }
+    catch (err) {
+        throw new Error("result fetch failed");
+    }
+};
 //# sourceMappingURL=service.js.map

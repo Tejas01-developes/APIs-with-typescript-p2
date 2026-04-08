@@ -134,3 +134,21 @@ const [res]=await db.query<RowDataPacket[]>(
 return res.length > 0 ? res[0]! :null
 
         }
+
+type filedata={
+  userid:string
+
+}
+
+        export const getfiledta=async(data:filedata):Promise<RowDataPacket| null>=>{
+            try{
+     const [res]=await db.query<RowDataPacket[]>(
+                'select * from imagefolder where userid=?',
+                [data.userid]
+            )
+            return res.length > 0 ? res[0]! :null
+
+        }catch(err){
+            throw new Error("result fetch failed")
+        }
+    }
