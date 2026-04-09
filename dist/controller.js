@@ -103,7 +103,9 @@ export const displayfile = async (req, resp) => {
             return resp.status(400).json({ success: false, message: "no result in the array" });
         }
         const url = getres.fileurl;
+        console.log(url);
         const fileurl = url.replace(/\\/g, "/");
+        console.log(fileurl);
         if (!fs.existsSync(fileurl)) {
             return resp.status(400).json({ success: false, message: "file path is not correct" });
         }
